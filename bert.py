@@ -43,13 +43,13 @@ import torch
 from tqdm import tqdm
 from transformers import AutoModelForSequenceClassification
 
-from finbert import config
+import config
 
 # --------------------------------------------------------------------------
-# Config -- everything tunable lives here, matching the rest of the project.
+# Config -- everything tunable lives here; paths and device come from config.py.
 # --------------------------------------------------------------------------
-TOKENIZED_CSV = config.PROJECT_ROOT / "outputs" / "alpaca_news_tagged_filtered_tokenized.csv"
-OUTPUT_PARQUET = config.PROJECT_ROOT / "outputs" / "alpaca_news_finbert_representations.parquet"
+TOKENIZED_CSV = config.NEWS_TOKENIZED_CSV
+OUTPUT_PARQUET = config.FINBERT_PARQUET
 
 # CSV rows parsed and held in memory at once; also one parquet row group.
 # 20k rows of output is ~300 MB, which the writer flushes straight to disk.
@@ -71,7 +71,8 @@ LIMIT_ROWS = None
 # Model
 # --------------------------------------------------------------------------
 DEVICE = config.DEVICE if config.DEVICE != "auto" else (
-    "mps" if torch.backends.mps.is_available() else "cpu")
+    "cuda" if torch.cuda.is_available()
+    else "mps" if torch.backends.mps.is_available() else "cpu")
 
 # Load the sequence-classification checkpoint and split it into the two pieces
 # this script uses: the `.bert` trunk, which carries the fine-tuned pooler
@@ -207,6 +208,7 @@ if LIMIT_ROWS is not None:
 
 print(f"FinBERT on {DEVICE}: {total_rows:,} articles ({TOKENS_COLUMN}) -> {OUTPUT_PARQUET.name}")
 
+OUTPUT_PARQUET.parent.mkdir(parents=True, exist_ok=True)
 reader = pd.read_csv(TOKENIZED_CSV, chunksize=CHUNK_ROWS, nrows=LIMIT_ROWS,
                      dtype=str)   # the list columns arrive as strings either way
 written = 0
