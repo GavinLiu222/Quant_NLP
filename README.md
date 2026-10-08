@@ -94,9 +94,9 @@ Every grid combination is written to `xgb_grid_results.csv`.
 
 ## Data you need
 
-The three inputs (FinBERT model, minute-bar database and tagged news) can be downloaded from a cloud drive:
+The three inputs (FinBERT model, minute-bar database and tagged news) can be downloaded from Google Drive:
 
-> 📦 **Download:** `<cloud drive link>` (access code: `<code>`)
+> 📦 **Download:** [Google Drive](https://drive.google.com/drive/folders/1X4NKb29yGoH6cwxr8hvRlGRYPH0HHEhv?usp=sharing)
 
 After downloading, put them in the default locations below, or point `config.py` at wherever you saved them.
 
@@ -151,7 +151,7 @@ pip install -r requirements.txt
 
 For a GPU, first install the PyTorch build that matches your CUDA version (see [pytorch.org](https://pytorch.org/get-started/locally/)).
 
-**2. Download the data** from the cloud drive (see [Data you need](#data-you-need)) and put it in the default layout, or wherever `config.py` points:
+**2. Download the data** from [Google Drive](https://drive.google.com/drive/folders/1X4NKb29yGoH6cwxr8hvRlGRYPH0HHEhv?usp=sharing) (see [Data you need](#data-you-need)) and put it in the default layout, or wherever `config.py` points:
 
 ```
 Quant_NLP/
@@ -291,9 +291,9 @@ flowchart TD
 
 ## 所需数据
 
-三份输入（FinBERT 模型、分钟 K 线数据库、标签新闻）可从网盘下载：
+三份输入（FinBERT 模型、分钟 K 线数据库、标签新闻）可从 Google Drive 下载：
 
-> 📦 **下载：** `<网盘链接>`（提取码：`<提取码>`）
+> 📦 **下载：** [Google Drive](https://drive.google.com/drive/folders/1X4NKb29yGoH6cwxr8hvRlGRYPH0HHEhv?usp=sharing)
 
 下载后放到下表的默认位置，或在 `config.py` 中改成实际保存的路径。
 
@@ -348,7 +348,7 @@ pip install -r requirements.txt
 
 如需使用 GPU，请先按 [pytorch.org](https://pytorch.org/get-started/locally/) 安装与 CUDA 版本对应的 PyTorch。
 
-**2. 下载数据**：从网盘下载（见[所需数据](#所需数据)），按默认目录结构放置，或放在 `config.py` 指向的位置：
+**2. 下载数据**：从 [Google Drive](https://drive.google.com/drive/folders/1X4NKb29yGoH6cwxr8hvRlGRYPH0HHEhv?usp=sharing) 下载（见[所需数据](#所需数据)），按默认目录结构放置，或放在 `config.py` 指向的位置：
 
 ```
 Quant_NLP/
