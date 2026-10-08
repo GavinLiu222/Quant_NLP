@@ -4,7 +4,7 @@ Keeps only the articles with tag == 1 that mention exactly one ticker, then
 strips headline, summary and content down to plain ASCII prose.
 
 Input
-  outputs/alpaca_news_tagged.csv
+  config.NEWS_TAGGED_CSV   (default data/alpaca_news_tagged.csv)
     id, headline, summary, content, symbols, created_at, tag
     - tag:     1 = keep, 0 = drop
     - symbols: comma-separated tickers; rows with more than one are dropped
@@ -16,7 +16,7 @@ Cleaning (same chain on headline, summary and content)
   Missing values become ''.
 
 Output
-  outputs/alpaca_news_tagged_filtered.csv
+  config.NEWS_FILTERED_CSV   (default outputs/alpaca_news_tagged_filtered.csv)
     id, headline, summary, content, symbols, created_at   (original columns, tag removed)
     body                raw headline + ' ' + content (NaN if either is missing)
     headline_filtered   cleaned headline
@@ -27,8 +27,10 @@ Output
 
 import pandas as pd
 
+import config
+
 # Drop rows with tag 0 and rows with multiple symbols
-df = pd.read_csv('/Users/gavin/Programming/US_Stock_QuantTrading/outputs/alpaca_news_tagged.csv')
+df = pd.read_csv(config.NEWS_TAGGED_CSV)
 df = df[df['tag'] == 1].drop(columns=['tag'])
 df = df[~df['symbols'].str.contains(',')]
 
@@ -107,4 +109,5 @@ df['body_filtered'] = df['headline_filtered'] + ' ' + df['content_filtered']
 # df['body_filtered'] = body.str.replace(r'\s+', ' ', regex=True).str.strip()                # collapse the gaps left behind, trim ends
 
 # Save the filtered dataframe to a new CSV file
-df.to_csv('/Users/gavin/Programming/US_Stock_QuantTrading/outputs/alpaca_news_tagged_filtered.csv', index=False)
+config.NEWS_FILTERED_CSV.parent.mkdir(parents=True, exist_ok=True)
+df.to_csv(config.NEWS_FILTERED_CSV, index=False)

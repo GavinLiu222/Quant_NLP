@@ -2,7 +2,7 @@
 whether a stock rises between entry and the same trading day's close.
 
 Input
-  outputs/alpaca_news_finbert_representations.parquet
+  config.FINBERT_PARQUET   (default outputs/alpaca_news_finbert_representations.parquet)
     symbols, created_at      ticker and publish time (UTC), the join key
     logits                   3-d raw scores of a positive / negative / neutral
                              classification head (order in the schema metadata
@@ -10,7 +10,7 @@ Input
     cls_last, pooler, mean_last, cls_second_last, mean_second_last
                              768-d sentence vectors
     Only `symbols`, `created_at` and the columns named in REPRESENTATIONS are read.
-  /Volumes/GAVIN/QuantDB/high_freq.duckdb
+  config.PRICES_DB   (default data/high_freq.duckdb)
     One table of 1-minute bars per trading day, named yyyy-mm-dd; the table
     names are the trading calendar.  Bars run 04:00-20:00 New York time, and
     only the regular session is used: [09:30, 16:00), or [09:30, 13:00) on the
@@ -48,7 +48,7 @@ Output
   console: per-representation test results -- chosen parameters, number and
     share of predicted ups, up precision, accuracy -- against the test set's
     base rate of ups
-  outputs/xgb_grid_results.csv
+  config.XGB_GRID_RESULTS_CSV   (default outputs/xgb_grid_results.csv)
     representation, learning_rate, max_depth, subsample, best_iteration,
     valid_logloss -- one row per (representation, parameter combination)
 """
@@ -61,8 +61,10 @@ import pandas as pd
 import xgboost as xgb
 from tqdm import tqdm
 
-PARQUET_PATH = '/Users/gavin/Programming/US_Stock_QuantTrading/outputs/alpaca_news_finbert_representations.parquet'
-PRICES_PATH = '/Volumes/GAVIN/QuantDB/high_freq.duckdb'
+import config
+
+PARQUET_PATH = config.FINBERT_PARQUET
+PRICES_PATH = config.PRICES_DB
 MARKET_TIMEZONE = 'America/New_York'
 SESSION_OPEN = '09:30'
 SESSION_CLOSE = '16:00'                 # the 16:00 bar is already after-hours trading, not the close
@@ -91,7 +93,7 @@ FIXED_PARAMS = {
 EVAL_METRIC = 'logloss'                 # validation metric for tuning and early stopping; follows the objective
 N_ESTIMATORS = 500                      # upper bound; the actual number of rounds is set by early stopping
 EARLY_STOPPING_ROUNDS = 30
-GRID_RESULTS_PATH = '/Users/gavin/Programming/US_Stock_QuantTrading/outputs/xgb_grid_results.csv'
+GRID_RESULTS_PATH = config.XGB_GRID_RESULTS_CSV
 
 # --------------------------------------------------------------------------------------------------------------
 # Data Preparation
@@ -114,7 +116,7 @@ def to_utc_ns(days, clocks):
 news = df_features[['ticker', 'created_at']].drop_duplicates().reset_index(drop=True)
 news['created_ns'] = news['created_at'].dt.as_unit('ns').astype('int64')
 
-con = duckdb.connect(PRICES_PATH, read_only=True)
+con = duckdb.connect(str(PRICES_PATH), read_only=True)
 
 # Trading calendar: the DB has one table per trading day and none for weekends or holidays
 days = sorted(name for (name,) in con.execute('SELECT table_name FROM duckdb_tables()').fetchall()
@@ -306,6 +308,7 @@ for rep in REPRESENTATIONS:
           f'up precision {precision_up:.2%} ({picked.sum():,} predicted up) | took {time.time() - t0:.0f}s')
     del X, X_fit, X_valid, X_train, X_test
 
+GRID_RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
 pd.DataFrame(grid_rows).to_csv(GRID_RESULTS_PATH, index=False)
 
 # Baseline: the share of ups already in the test set.  Only a precision above it means the model picked something out

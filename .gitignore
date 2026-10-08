@@ -1,0 +1,10 @@
+# Data, model weights and pipeline outputs -- large, kept out of git
+data/
+models/
+outputs/
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store

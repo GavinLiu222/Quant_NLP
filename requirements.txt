@@ -1,0 +1,8 @@
+pandas>=3.0
+numpy
+pyarrow
+torch
+transformers
+tqdm
+duckdb
+xgboost
